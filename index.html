@@ -165,7 +165,7 @@
             line-height: 1.5;
         }
         .console-container {
-            height: 400px;
+            height: 200px;
             min-height: 150px;
             max-height: 400px;
             background: #1e1e1e;
@@ -655,7 +655,9 @@
             }
 
             const code = editor.getValue();
-            
+            addToConsole('─'.repeat(50), 'info');
+            addToConsole(`Running ${currentFile}...`, 'info');
+            addToConsole('─'.repeat(50), 'info');
 
             setupConsole();
 
@@ -672,6 +674,8 @@
                 restoreConsole();
             }
 
+            addToConsole('─'.repeat(50), 'info');
+            addToConsole('Execution completed', 'success');
         }
 
         // Modal helpers
