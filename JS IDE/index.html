@@ -155,14 +155,20 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: auto;   /* changed */
+            min-height: 0;
         }
+
         .CodeMirror {
             flex: 1;
-            height: auto;
+            height: 100%;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.5;
+            overflow: auto;   /* added */
+        }
+        .CodeMirror-scroll {
+            overflow: auto !important;
         }
         .console-container {
             height: 400px;
