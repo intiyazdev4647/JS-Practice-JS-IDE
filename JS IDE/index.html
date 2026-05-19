@@ -1,715 +1,804 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JS IDE - Browser Edition</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 260px;
-            background: #252526;
-            border-right: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-header {
-            padding: 15px;
-            background: #2d2d30;
-            border-bottom: 1px solid #333;
-        }
-        .sidebar-header h2 {
-            font-size: 14px;
-            color: #cccccc;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .file-actions {
-            padding: 10px;
-            display: flex;
-            gap: 8px;
-            border-bottom: 1px solid #333;
-        }
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-primary {
-            background: #0e639c;
-            color: white;
-        }
-        .btn-primary:hover { background: #1177bb; }
-        .btn-secondary {
-            background: #3c3c3c;
-            color: #cccccc;
-            border: 1px solid #555;
-        }
-        .btn-secondary:hover { background: #4c4c4c; }
-        .btn-success {
-            background: #238636;
-            color: white;
-        }
-        .btn-success:hover { background: #2ea043; }
-        .btn-danger {
-            background: #da3633;
-            color: white;
-        }
-        .btn-danger:hover { background: #f85149; }
-        .file-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 5px 0;
-        }
-        .file-item {
-            padding: 8px 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            transition: background 0.2s;
-            position: relative;
-        }
-        .file-item:hover {
-            background: #2a2d2e;
-        }
-        .file-item.active {
-            background: #37373d;
-        }
-        .file-item .file-icon {
-            color: #dcb67a;
-            font-size: 14px;
-        }
-        .file-item .file-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .file-item .file-actions-menu {
-            display: none;
-            gap: 5px;
-        }
-        .file-item:hover .file-actions-menu {
-            display: flex;
-        }
-        .file-item .file-actions-menu button {
-            background: none;
-            border: none;
-            color: #858585;
-            cursor: pointer;
-            padding: 2px 5px;
-            font-size: 12px;
-        }
-        .file-item .file-actions-menu button:hover {
-            color: #fff;
-        }
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .toolbar {
-            height: 45px;
-            background: #2d2d30;
-            border-bottom: 1px solid #333;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            gap: 10px;
-        }
-        .toolbar .spacer {
-            flex: 1;
-        }
-        .toolbar-title {
-            font-size: 13px;
-            color: #cccccc;
-        }
-        .editor-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: auto;   /* changed */
-            min-height: 0;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+      .sidebar {
+        width: 260px;
+        background: #252526;
+        border-right: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar-header {
+        padding: 15px;
+        background: #2d2d30;
+        border-bottom: 1px solid #333;
+      }
+      .sidebar-header h2 {
+        font-size: 14px;
+        color: #cccccc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .file-actions {
+        padding: 10px;
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid #333;
+      }
+      .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .btn-primary {
+        background: #0e639c;
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #1177bb;
+      }
+      .btn-secondary {
+        background: #3c3c3c;
+        color: #cccccc;
+        border: 1px solid #555;
+      }
+      .btn-secondary:hover {
+        background: #4c4c4c;
+      }
+      .btn-success {
+        background: #238636;
+        color: white;
+      }
+      .btn-success:hover {
+        background: #2ea043;
+      }
+      .btn-danger {
+        background: #da3633;
+        color: white;
+      }
+      .btn-danger:hover {
+        background: #f85149;
+      }
+      .file-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 5px 0;
+      }
+      .file-item {
+        padding: 8px 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        transition: background 0.2s;
+        position: relative;
+      }
+      .file-item:hover {
+        background: #2a2d2e;
+      }
+      .file-item.active {
+        background: #37373d;
+      }
+      .file-item .file-icon {
+        color: #dcb67a;
+        font-size: 14px;
+      }
+      .file-item .file-name {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .file-item .file-actions-menu {
+        display: none;
+        gap: 5px;
+      }
+      .file-item:hover .file-actions-menu {
+        display: flex;
+      }
+      .file-item .file-actions-menu button {
+        background: none;
+        border: none;
+        color: #858585;
+        cursor: pointer;
+        padding: 2px 5px;
+        font-size: 12px;
+      }
+      .file-item .file-actions-menu button:hover {
+        color: #fff;
+      }
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .toolbar {
+        height: 45px;
+        background: #2d2d30;
+        border-bottom: 1px solid #333;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        gap: 10px;
+      }
+      .toolbar .spacer {
+        flex: 1;
+      }
+      .toolbar-title {
+        font-size: 13px;
+        color: #cccccc;
+      }
+      .editor-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        min-height: 0;
+      }
 
-        .CodeMirror {
-            flex: 1;
-            height: 100%;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            overflow: auto;   /* added */
+      .CodeMirror {
+        height: 100%;
+        flex: 1;
+        font-family: "Consolas", "Monaco", "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .CodeMirror-scroll {
+        overflow: auto !important;
+        scroll-behavior: smooth;
+      }
+      .console-container {
+        height: 400px;
+        min-height: 150px;
+        max-height: 400px;
+        background: #1e1e1e;
+        border-top: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        resize: vertical;
+        overflow: hidden;
+      }
+      .console-header {
+        height: 32px;
+        background: #2d2d30;
+        border-bottom: 1px solid #333;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        justify-content: space-between;
+      }
+      .console-header span {
+        font-size: 12px;
+        color: #cccccc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .console-output {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        font-family: "Consolas", "Monaco", "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .console-line {
+        padding: 2px 0;
+        border-bottom: 1px solid #2a2a2a;
+        word-wrap: break-word;
+      }
+      .console-line.log {
+        color: #d4d4d4;
+      }
+      .console-line.error {
+        color: #f48771;
+        background: #3a1d1d;
+      }
+      .console-line.warn {
+        color: #dcdcaa;
+        background: #3a3a1d;
+      }
+      .console-line.info {
+        color: #4fc1ff;
+      }
+      .console-line.success {
+        color: #4ec9b0;
+      }
+      .console-timestamp {
+        color: #858585;
+        font-size: 11px;
+        margin-right: 8px;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal-content {
+        background: #252526;
+        border: 1px solid #454545;
+        border-radius: 6px;
+        padding: 20px;
+        min-width: 350px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .modal-content h3 {
+        margin-bottom: 15px;
+        color: #cccccc;
+        font-size: 16px;
+      }
+      .modal-content input {
+        width: 100%;
+        padding: 8px 12px;
+        background: #3c3c3c;
+        border: 1px solid #555;
+        border-radius: 4px;
+        color: #cccccc;
+        font-size: 14px;
+        margin-bottom: 15px;
+      }
+      .modal-content input:focus {
+        outline: none;
+        border-color: #0e639c;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6e6e6e;
+        text-align: center;
+        padding: 40px;
+      }
+      .empty-state h3 {
+        margin-bottom: 10px;
+        font-weight: 400;
+      }
+      .empty-state p {
+        font-size: 13px;
+      }
+      .run-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #238636;
+        margin-right: 6px;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
         }
-        .CodeMirror-scroll {
-            overflow: auto !important; /* added */
+        50% {
+          opacity: 0.5;
         }
-        .console-container {
-            height: 400px;
-            min-height: 150px;
-            max-height: 400px;
-            background: #1e1e1e;
-            border-top: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            resize: vertical;
-            overflow: hidden;
-        }
-        .console-header {
-            height: 32px;
-            background: #2d2d30;
-            border-bottom: 1px solid #333;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            justify-content: space-between;
-        }
-        .console-header span {
-            font-size: 12px;
-            color: #cccccc;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .console-output {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-        .console-line {
-            padding: 2px 0;
-            border-bottom: 1px solid #2a2a2a;
-            word-wrap: break-word;
-        }
-        .console-line.log { color: #d4d4d4; }
-        .console-line.error { color: #f48771; background: #3a1d1d; }
-        .console-line.warn { color: #dcdcaa; background: #3a3a1d; }
-        .console-line.info { color: #4fc1ff; }
-        .console-line.success { color: #4ec9b0; }
-        .console-timestamp {
-            color: #858585;
-            font-size: 11px;
-            margin-right: 8px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: #252526;
-            border: 1px solid #454545;
-            border-radius: 6px;
-            padding: 20px;
-            min-width: 350px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .modal-content h3 {
-            margin-bottom: 15px;
-            color: #cccccc;
-            font-size: 16px;
-        }
-        .modal-content input {
-            width: 100%;
-            padding: 8px 12px;
-            background: #3c3c3c;
-            border: 1px solid #555;
-            border-radius: 4px;
-            color: #cccccc;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        .modal-content input:focus {
-            outline: none;
-            border-color: #0e639c;
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #6e6e6e;
-            text-align: center;
-            padding: 40px;
-        }
-        .empty-state h3 {
-            margin-bottom: 10px;
-            font-weight: 400;
-        }
-        .empty-state p {
-            font-size: 13px;
-        }
-        .run-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #238636;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .shortcut {
-            color: #858585;
-            font-size: 11px;
-            margin-left: 5px;
-        }
+      }
+      .shortcut {
+        color: #858585;
+        font-size: 11px;
+        margin-left: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Explorer</h2>
-            </div>
-            <div class="file-actions">
-                <button class="btn btn-primary" onclick="createNewFile()">
-                    <span>+</span> New
-                </button>
-                <button class="btn btn-secondary" onclick="importFile()">
-                    <span>↑</span> Import
-                </button>
-            </div>
-            <div class="file-list" id="fileList">
-                <!-- Files will be listed here -->
-            </div>
-            <div style="padding: 10px; border-top: 1px solid #333;">
-                <button class="btn btn-success" style="width: 100%;" onclick="downloadAllFiles()">
-                    <span>↓</span> Download All
-                </button>
-            </div>
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>Explorer</h2>
+        </div>
+        <div class="file-actions">
+          <button class="btn btn-primary" onclick="createNewFile()">
+            <span>+</span> New
+          </button>
+          <button class="btn btn-secondary" onclick="importFile()">
+            <span>↑</span> Import
+          </button>
+        </div>
+        <div class="file-list" id="fileList">
+          <!-- Files will be listed here -->
+        </div>
+        <div style="padding: 10px; border-top: 1px solid #333">
+          <button
+            class="btn btn-success"
+            style="width: 100%"
+            onclick="downloadAllFiles()"
+          >
+            <span>↓</span> Download All
+          </button>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="toolbar">
+          <span class="toolbar-title" id="currentFileName"
+            >No file selected</span
+          >
+          <div class="spacer"></div>
+          <button class="btn btn-success" onclick="runCode()">
+            <span class="run-indicator"></span> Run
+          </button>
+          <button class="btn btn-secondary" onclick="downloadCurrentFile()">
+            <span>↓</span> Download
+          </button>
+          <button class="btn btn-danger" onclick="clearConsole()">
+            Clear Console
+          </button>
         </div>
 
-        <div class="main-content">
-            <div class="toolbar">
-                <span class="toolbar-title" id="currentFileName">No file selected</span>
-                <div class="spacer"></div>
-                <button class="btn btn-success" onclick="runCode()">
-                    <span class="run-indicator"></span> Run
-                </button>
-                <button class="btn btn-secondary" onclick="downloadCurrentFile()">
-                    <span>↓</span> Download
-                </button>
-                <button class="btn btn-danger" onclick="clearConsole()">
-                    Clear Console
-                </button>
-            </div>
-
-            <div class="editor-container">
-                <div id="editor"></div>
-                <div class="empty-state" id="emptyState">
-                    <h3>No file open</h3>
-                    <p>Create a new file or select one from the sidebar to start coding</p>
-                </div>
-            </div>
-
-            <div class="console-container">
-                <div class="console-header">
-                    <span>Console Output</span>
-                    <span class="shortcut">Ctrl+Enter to run</span>
-                </div>
-                <div class="console-output" id="consoleOutput"></div>
-            </div>
+        <div class="editor-container">
+          <div id="editor"></div>
+          <div class="empty-state" id="emptyState">
+            <h3>No file open</h3>
+            <p>
+              Create a new file or select one from the sidebar to start coding
+            </p>
+          </div>
         </div>
+
+        <div class="console-container">
+          <div class="console-header">
+            <span>Console Output</span>
+            <span class="shortcut">Ctrl+Enter to run</span>
+          </div>
+          <div class="console-output" id="consoleOutput"></div>
+        </div>
+      </div>
     </div>
 
     <!-- New File Modal -->
     <div class="modal" id="newFileModal">
-        <div class="modal-content">
-            <h3>Create New File</h3>
-            <input type="text" id="newFileName" placeholder="filename.js" onkeypress="if(event.key==='Enter')confirmNewFile()">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal('newFileModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmNewFile()">Create</button>
-            </div>
+      <div class="modal-content">
+        <h3>Create New File</h3>
+        <input
+          type="text"
+          id="newFileName"
+          placeholder="filename.js"
+          onkeypress="if (event.key === 'Enter') confirmNewFile();"
+        />
+        <div class="modal-actions">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('newFileModal')"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="confirmNewFile()">
+            Create
+          </button>
         </div>
+      </div>
     </div>
 
     <!-- Rename Modal -->
     <div class="modal" id="renameModal">
-        <div class="modal-content">
-            <h3>Rename File</h3>
-            <input type="text" id="renameFileName" placeholder="new filename.js" onkeypress="if(event.key==='Enter')confirmRename()">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal('renameModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmRename()">Rename</button>
-            </div>
+      <div class="modal-content">
+        <h3>Rename File</h3>
+        <input
+          type="text"
+          id="renameFileName"
+          placeholder="new filename.js"
+          onkeypress="if (event.key === 'Enter') confirmRename();"
+        />
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeModal('renameModal')">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="confirmRename()">
+            Rename
+          </button>
         </div>
+      </div>
     </div>
 
     <!-- Hidden file input for import -->
-    <input type="file" id="fileInput" accept=".js,.txt" style="display: none;" onchange="handleFileImport(event)">
+    <input
+      type="file"
+      id="fileInput"
+      accept=".js,.txt"
+      style="display: none"
+      onchange="handleFileImport(event)"
+    />
 
     <script>
-        // State management
-        let files = {};
-        let currentFile = null;
-        let editor = null;
-        let fileCounter = 1;
+      // State management
+      let files = {};
+      let currentFile = null;
+      let editor = null;
+      let fileCounter = 1;
 
-        // Initialize CodeMirror
-        function initEditor() {
-            editor = CodeMirror(document.getElementById('editor'), {
-                mode: 'javascript',
-                theme: 'dracula',
-                lineNumbers: true,
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                indentUnit: 4,
-                tabSize: 4,
-                lineWrapping: true,
-                extraKeys: {
-                    "Ctrl-Enter": runCode,
-                    "Cmd-Enter": runCode,
-                    "Ctrl-S": function() { downloadCurrentFile(); return false; },
-                    "Cmd-S": function() { downloadCurrentFile(); return false; }
-                }
-            });
+      // Initialize CodeMirror
+      function initEditor() {
+        editor = CodeMirror(document.getElementById("editor"), {
+          mode: "javascript",
+          theme: "dracula",
+          lineNumbers: true,
+          autoCloseBrackets: true,
+          matchBrackets: true,
+          indentUnit: 4,
+          tabSize: 4,
+          lineWrapping: true,
+          extraKeys: {
+            "Ctrl-Enter": runCode,
+            "Cmd-Enter": runCode,
+            "Ctrl-S": function () {
+              downloadCurrentFile();
+              return false;
+            },
+            "Cmd-S": function () {
+              downloadCurrentFile();
+              return false;
+            }
+          }
+        });
 
-            editor.on('change', function() {
-                if (currentFile) {
-                    files[currentFile].content = editor.getValue();
-                    files[currentFile].modified = true;
-                    updateFileList();
-                }
-            });
-        }
+        editor.on("change", function () {
+          if (currentFile) {
+            files[currentFile].content = editor.getValue();
+            files[currentFile].modified = true;
+            updateFileList();
+          }
+        });
 
-        // Console override
-        const originalConsole = {
-            log: console.log,
-            error: console.error,
-            warn: console.warn,
-            info: console.info
+        // Auto focus current typing line
+        editor.on("cursorActivity", function (cm) {
+          const cursor = cm.getCursor();
+          cm.scrollIntoView(cursor, 100);
+        });
+      }
+      // Console override
+      const originalConsole = {
+        log: console.log,
+        error: console.error,
+        warn: console.warn,
+        info: console.info
+      };
+
+      function setupConsole() {
+        console.log = function (...args) {
+          originalConsole.log.apply(console, args);
+          addToConsole(args.join(" "), "log");
         };
+        console.error = function (...args) {
+          originalConsole.error.apply(console, args);
+          addToConsole(args.join(" "), "error");
+        };
+        console.warn = function (...args) {
+          originalConsole.warn.apply(console, args);
+          addToConsole(args.join(" "), "warn");
+        };
+        console.info = function (...args) {
+          originalConsole.info.apply(console, args);
+          addToConsole(args.join(" "), "info");
+        };
+      }
 
-        function setupConsole() {
-            console.log = function(...args) {
-                originalConsole.log.apply(console, args);
-                addToConsole(args.join(' '), 'log');
-            };
-            console.error = function(...args) {
-                originalConsole.error.apply(console, args);
-                addToConsole(args.join(' '), 'error');
-            };
-            console.warn = function(...args) {
-                originalConsole.warn.apply(console, args);
-                addToConsole(args.join(' '), 'warn');
-            };
-            console.info = function(...args) {
-                originalConsole.info.apply(console, args);
-                addToConsole(args.join(' '), 'info');
-            };
+      function restoreConsole() {
+        console.log = originalConsole.log;
+        console.error = originalConsole.error;
+        console.warn = originalConsole.warn;
+        console.info = originalConsole.info;
+      }
+
+      function addToConsole(message, type = "log") {
+        const output = document.getElementById("consoleOutput");
+        const line = document.createElement("div");
+        line.className = `console-line ${type}`;
+
+        const timestamp = new Date().toLocaleTimeString();
+        line.innerHTML = `<span class="console-timestamp">[${timestamp}]</span> ${escapeHtml(String(message))}`;
+
+        output.appendChild(line);
+        output.scrollTop = output.scrollHeight;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function clearConsole() {
+        document.getElementById("consoleOutput").innerHTML = "";
+      }
+
+      // File management
+      function createNewFile() {
+        document.getElementById("newFileName").value =
+          `script${fileCounter}.js`;
+        openModal("newFileModal");
+        setTimeout(() => document.getElementById("newFileName").focus(), 100);
+      }
+
+      function confirmNewFile() {
+        let name = document.getElementById("newFileName").value.trim();
+        if (!name) return;
+        if (!name.endsWith(".js")) name += ".js";
+        if (files[name]) {
+          alert("File already exists!");
+          return;
         }
 
-        function restoreConsole() {
-            console.log = originalConsole.log;
-            console.error = originalConsole.error;
-            console.warn = originalConsole.warn;
-            console.info = originalConsole.info;
+        files[name] = {
+          content:
+            '// Write your JavaScript code here\n\nconsole.log("Hello, World!");',
+          modified: false,
+          created: new Date()
+        };
+        fileCounter++;
+        closeModal("newFileModal");
+        selectFile(name);
+        updateFileList();
+      }
+
+      function selectFile(name) {
+        if (currentFile && editor) {
+          files[currentFile].content = editor.getValue();
         }
 
-        function addToConsole(message, type = 'log') {
-            const output = document.getElementById('consoleOutput');
-            const line = document.createElement('div');
-            line.className = `console-line ${type}`;
+        currentFile = name;
+        document.getElementById("currentFileName").textContent =
+          name + (files[name].modified ? " ●" : "");
+        document.getElementById("emptyState").style.display = "none";
+        document.getElementById("editor").style.display = "block";
 
-            const timestamp = new Date().toLocaleTimeString();
-            line.innerHTML = `<span class="console-timestamp">[${timestamp}]</span> ${escapeHtml(String(message))}`;
-
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
+        if (editor) {
+          editor.setValue(files[name].content);
+          editor.refresh();
         }
+        updateFileList();
+      }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+      function updateFileList() {
+        const list = document.getElementById("fileList");
+        list.innerHTML = "";
 
-        function clearConsole() {
-            document.getElementById('consoleOutput').innerHTML = '';
-        }
-
-        // File management
-        function createNewFile() {
-            document.getElementById('newFileName').value = `script${fileCounter}.js`;
-            openModal('newFileModal');
-            setTimeout(() => document.getElementById('newFileName').focus(), 100);
-        }
-
-        function confirmNewFile() {
-            let name = document.getElementById('newFileName').value.trim();
-            if (!name) return;
-            if (!name.endsWith('.js')) name += '.js';
-            if (files[name]) {
-                alert('File already exists!');
-                return;
-            }
-
-            files[name] = {
-                content: '// Write your JavaScript code here\n\nconsole.log("Hello, World!");',
-                modified: false,
-                created: new Date()
-            };
-            fileCounter++;
-            closeModal('newFileModal');
-            selectFile(name);
-            updateFileList();
-        }
-
-        function selectFile(name) {
-            if (currentFile && editor) {
-                files[currentFile].content = editor.getValue();
-            }
-
-            currentFile = name;
-            document.getElementById('currentFileName').textContent = name + (files[name].modified ? ' ●' : '');
-            document.getElementById('emptyState').style.display = 'none';
-            document.getElementById('editor').style.display = 'block';
-
-            if (editor) {
-                editor.setValue(files[name].content);
-                editor.refresh();
-            }
-            updateFileList();
-        }
-
-        function updateFileList() {
-            const list = document.getElementById('fileList');
-            list.innerHTML = '';
-
-            Object.keys(files).forEach(name => {
-                const item = document.createElement('div');
-                item.className = `file-item ${name === currentFile ? 'active' : ''}`;
-                item.innerHTML = `
+        Object.keys(files).forEach((name) => {
+          const item = document.createElement("div");
+          item.className = `file-item ${name === currentFile ? "active" : ""}`;
+          item.innerHTML = `
                     <span class="file-icon">JS</span>
-                    <span class="file-name">${name}${files[name].modified ? ' ●' : ''}</span>
+                    <span class="file-name">${name}${files[name].modified ? " ●" : ""}</span>
                     <div class="file-actions-menu">
                         <button onclick="event.stopPropagation(); renameFile('${name}')" title="Rename">✎</button>
                         <button onclick="event.stopPropagation(); downloadFile('${name}')" title="Download">↓</button>
                         <button onclick="event.stopPropagation(); deleteFile('${name}')" title="Delete">×</button>
                     </div>
                 `;
-                item.onclick = () => selectFile(name);
-                list.appendChild(item);
-            });
-        }
-
-        function renameFile(name) {
-            document.getElementById('renameFileName').value = name;
-            document.getElementById('renameModal').dataset.oldName = name;
-            openModal('renameModal');
-            setTimeout(() => document.getElementById('renameFileName').focus(), 100);
-        }
-
-        function confirmRename() {
-            const oldName = document.getElementById('renameModal').dataset.oldName;
-            let newName = document.getElementById('renameFileName').value.trim();
-            if (!newName || newName === oldName) {
-                closeModal('renameModal');
-                return;
-            }
-            if (!newName.endsWith('.js')) newName += '.js';
-            if (files[newName]) {
-                alert('File already exists!');
-                return;
-            }
-
-            files[newName] = files[oldName];
-            delete files[oldName];
-            if (currentFile === oldName) currentFile = newName;
-            closeModal('renameModal');
-            updateFileList();
-            if (currentFile === newName) {
-                document.getElementById('currentFileName').textContent = newName;
-            }
-        }
-
-        function deleteFile(name) {
-            if (!confirm(`Delete "${name}"?`)) return;
-            delete files[name];
-            if (currentFile === name) {
-                currentFile = null;
-                editor.setValue('');
-                document.getElementById('currentFileName').textContent = 'No file selected';
-                document.getElementById('emptyState').style.display = 'flex';
-                document.getElementById('editor').style.display = 'none';
-            }
-            updateFileList();
-        }
-
-        function importFile() {
-            document.getElementById('fileInput').click();
-        }
-
-        function handleFileImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let name = file.name;
-                if (files[name]) {
-                    let counter = 1;
-                    while (files[`${name.replace('.js', '')}_${counter}.js`]) counter++;
-                    name = `${name.replace('.js', '')}_${counter}.js`;
-                }
-
-                files[name] = {
-                    content: e.target.result,
-                    modified: false,
-                    created: new Date()
-                };
-                selectFile(name);
-                updateFileList();
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        // Download functions
-        function downloadFile(name) {
-            const blob = new Blob([files[name].content], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            files[name].modified = false;
-            updateFileList();
-            if (currentFile === name) {
-                document.getElementById('currentFileName').textContent = name;
-            }
-        }
-
-        function downloadCurrentFile() {
-            if (!currentFile) {
-                alert('No file selected!');
-                return;
-            }
-            downloadFile(currentFile);
-        }
-
-        function downloadAllFiles() {
-            if (Object.keys(files).length === 0) {
-                alert('No files to download!');
-                return;
-            }
-
-            Object.keys(files).forEach(name => {
-                setTimeout(() => downloadFile(name), 100);
-            });
-        }
-
-        // Code execution
-        function runCode() {
-            if (!currentFile) {
-                alert('No file selected!');
-                return;
-            }
-
-            const code = editor.getValue();
-            
-
-            setupConsole();
-
-            try {
-                // Create a safe-ish execution environment
-                const result = eval(code);
-                if (result !== undefined) {
-                    addToConsole(`Return value: ${result}`, 'success');
-                }
-            } catch (error) {
-                addToConsole(`Error: ${error.message}`, 'error');
-                addToConsole(`Stack: ${error.stack}`, 'error');
-            } finally {
-                restoreConsole();
-            }
-
-        }
-
-        // Modal helpers
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        // Close modal on outside click
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('active');
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            initEditor();
-            document.getElementById('editor').style.display = 'none';
-
-            // Create a welcome file
-            files['welcome.js'] = {
-                content: `// Welcome to JS IDE!\n// This is a browser-based JavaScript editor\n// Features:\n// - Write and run JavaScript code\n// - Console output below\n// - Save files locally (Download button)\n// - Import existing .js files\n\nconsole.log("Welcome to JS IDE!");\nconsole.log("Try editing this code and press Run (Ctrl+Enter)");\n\n// Example: Calculate factorial\nfunction factorial(n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}\n\nconsole.log("5! =", factorial(5));`,
-                modified: false,
-                created: new Date()
-            };
-            selectFile('welcome.js');
-            updateFileList();
+          item.onclick = () => selectFile(name);
+          list.appendChild(item);
         });
+      }
+
+      function renameFile(name) {
+        document.getElementById("renameFileName").value = name;
+        document.getElementById("renameModal").dataset.oldName = name;
+        openModal("renameModal");
+        setTimeout(
+          () => document.getElementById("renameFileName").focus(),
+          100
+        );
+      }
+
+      function confirmRename() {
+        const oldName = document.getElementById("renameModal").dataset.oldName;
+        let newName = document.getElementById("renameFileName").value.trim();
+        if (!newName || newName === oldName) {
+          closeModal("renameModal");
+          return;
+        }
+        if (!newName.endsWith(".js")) newName += ".js";
+        if (files[newName]) {
+          alert("File already exists!");
+          return;
+        }
+
+        files[newName] = files[oldName];
+        delete files[oldName];
+        if (currentFile === oldName) currentFile = newName;
+        closeModal("renameModal");
+        updateFileList();
+        if (currentFile === newName) {
+          document.getElementById("currentFileName").textContent = newName;
+        }
+      }
+
+      function deleteFile(name) {
+        if (!confirm(`Delete "${name}"?`)) return;
+        delete files[name];
+        if (currentFile === name) {
+          currentFile = null;
+          editor.setValue("");
+          document.getElementById("currentFileName").textContent =
+            "No file selected";
+          document.getElementById("emptyState").style.display = "flex";
+          document.getElementById("editor").style.display = "none";
+        }
+        updateFileList();
+      }
+
+      function importFile() {
+        document.getElementById("fileInput").click();
+      }
+
+      function handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          let name = file.name;
+          if (files[name]) {
+            let counter = 1;
+            while (files[`${name.replace(".js", "")}_${counter}.js`]) counter++;
+            name = `${name.replace(".js", "")}_${counter}.js`;
+          }
+
+          files[name] = {
+            content: e.target.result,
+            modified: false,
+            created: new Date()
+          };
+          selectFile(name);
+          updateFileList();
+        };
+        reader.readAsText(file);
+        event.target.value = "";
+      }
+
+      // Download functions
+      function downloadFile(name) {
+        const blob = new Blob([files[name].content], {
+          type: "application/javascript"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        files[name].modified = false;
+        updateFileList();
+        if (currentFile === name) {
+          document.getElementById("currentFileName").textContent = name;
+        }
+      }
+
+      function downloadCurrentFile() {
+        if (!currentFile) {
+          alert("No file selected!");
+          return;
+        }
+        downloadFile(currentFile);
+      }
+
+      function downloadAllFiles() {
+        if (Object.keys(files).length === 0) {
+          alert("No files to download!");
+          return;
+        }
+
+        Object.keys(files).forEach((name) => {
+          setTimeout(() => downloadFile(name), 100);
+        });
+      }
+
+      // Code execution
+      function runCode() {
+        if (!currentFile) {
+          alert("No file selected!");
+          return;
+        }
+
+        const code = editor.getValue();
+
+        setupConsole();
+
+        try {
+          // Create a safe-ish execution environment
+          const result = eval(code);
+          if (result !== undefined) {
+            addToConsole(`Return value: ${result}`, "success");
+          }
+        } catch (error) {
+          addToConsole(`Error: ${error.message}`, "error");
+          addToConsole(`Stack: ${error.stack}`, "error");
+        } finally {
+          restoreConsole();
+        }
+      }
+
+      // Modal helpers
+      function openModal(id) {
+        document.getElementById(id).classList.add("active");
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("active");
+      }
+
+      // Close modal on outside click
+      window.onclick = function (event) {
+        if (event.target.classList.contains("modal")) {
+          event.target.classList.remove("active");
+        }
+      };
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        initEditor();
+        document.getElementById("editor").style.display = "none";
+
+        // Create a welcome file
+        files["welcome.js"] = {
+          content: `// Welcome to JS IDE!\n// This is a browser-based JavaScript editor\n// Features:\n// - Write and run JavaScript code\n// - Console output below\n// - Save files locally (Download button)\n// - Import existing .js files\n\nconsole.log("Welcome to JS IDE!");\nconsole.log("Try editing this code and press Run (Ctrl+Enter)");\n\n// Example: Calculate factorial\nfunction factorial(n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}\n\nconsole.log("5! =", factorial(5));`,
+          modified: false,
+          created: new Date()
+        };
+        selectFile("welcome.js");
+        updateFileList();
+      });
     </script>
-</body>
+  </body>
 </html>
